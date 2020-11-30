@@ -1,0 +1,60 @@
+number function min(number x, number y)
+[
+	new number res;
+	condition: x < y #
+	istrue [res = x;]
+	isfalse [res = y;]#
+	return res;
+]
+procedure function stand (string a, string b)
+[
+	new number k;
+	k = lenght(a)+1;
+        write "Len:";
+	write k;
+	newline;
+	new string str;
+	str = concat(a,b);
+        write "concat:";
+	write str;
+	newline;
+        
+	return;
+]
+main
+[
+	new number x = 9;
+	new number y = -9;
+	new string strx = "Just";
+	new string stry = "string";
+        new string strz = "10November";
+        new number e;
+        write "from string in number:";
+        e = atoii(strz);
+        write e;
+        newline;
+        new number result;
+        result = x{1;
+        write "sdvig left:";
+        write result;
+        newline;
+ 	new number t;
+	t = min (x,y);
+        write t;
+	newline;
+	new number ab = 3;
+        new number d = q120;
+	condition: ab ! 52 #
+	cycle [
+		write ab;
+		write " ";
+		ab = (ab + 2)*2;
+	]#
+	write " ";
+	write ab;
+	newline;
+	stand(strx,stry);
+]
+
+
+

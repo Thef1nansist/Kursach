@@ -226,7 +226,7 @@ namespace Gener
 	void CodeGeneration(Lexer::LEX& tables, Parm::PARM& parm, Log::LOG& log)
 	{
 		vector <string> v = startFillVector(tables);
-		ofstream ofile("D:\\KDV_2019\\Generation\\Generation\\Gen.asm");
+		ofstream ofile("D:\\Kursach\\SVY2020\\Generation\\Gen.asm");
 		string funcname;	// имя текущей функции
 		string cyclecode;	// эпилог цикла: cmp + j
 		int pcount;			// количество параметров текущей функции
@@ -306,7 +306,7 @@ namespace Gener
 			}
 			case LEX_NEWLINE: // перевод строки 
 			{
-				str = str + "push offset newline\ncall outstr\n";
+				str += "push offset newline\ncall outstr\n";
 				break;
 			}
 			case LEX_WRITE: // вывод

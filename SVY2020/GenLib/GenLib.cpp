@@ -9,7 +9,7 @@
 
 extern "C"
 {
-	int __stdcall lenght(char* buffer, char* str)
+	int __stdcall lenght(char* str)
 	{
 		if (str == nullptr)
 			return 0;
@@ -21,47 +21,23 @@ extern "C"
 			}
 		return len;
 	}
-
-
-
-	int __stdcall atoii(char* ptr)
+	
+	int __stdcall atoii(const char* str)
 	{
-		if (ptr == nullptr)
-		{
-			std::cout << std::endl;
-		}
+		int number = 0;
+		for (int i = 0; str[i] && str[i] >= '0' && str[i] <= '9'; ++i)
+			number = (number * 10) + str[i] - '0';
 
-		int arr[3], n;
-		for (int i = 0; i < 4; i++) {
-			if (ptr[i] != '1' && ptr[i] != '2' && ptr[i] != '3' && ptr[i] != '4' && ptr[i] != '5' && ptr[i] != '6' && ptr[i] != '7' && ptr[i] != '8' && ptr[i] != '9' && ptr[i] != '0') {
-				if (ptr[0] == NULL)
-					return 0;
-				break;
-			}
-			else
-				arr[i] = (int)ptr[i] - 48;
-		}
-		if (arr[2] == 1 || arr[2] == 2 || arr[2] == 3 || arr[2] == 4 || arr[2] == 5 || arr[2] == 6 || arr[2] == 7 || arr[2] == 8 || arr[2] == 9 || arr[2] == 0) {
-			n = arr[0] * 100 + arr[1] * 10 + arr[2] * 1;
-			if (n > 128)
-				return 128;
-			return n;
-		}
-		if (arr[1] != NULL) {
-			n = arr[0] * 10 + arr[1] * 1;
-			return n;
-		}
-		if (arr[0] != NULL) {
-			n = arr[0] * 1;
-			return n;
-		}
-
+		return number;
 	}
+	
 
-
-	char* __stdcall concat(char* buffer, char* str1, char* str2)
+	char* __stdcall concat( char* str1, char* str2)
 	{
-		int i = NULL, len1 = NULL, len2 = NULL;
+		int i = NULL, len1 = NULL, len2 = NULL; char* buffer = NULL;
+		
+		buffer = (char*)malloc(sizeof(str1) + sizeof(str2));
+
 		for (int j = 0; str1[j] != '\0'; j++)
 		{
 			if (i == 255)

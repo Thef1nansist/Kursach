@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Header.h"
-#include <cwchar>
-#include <locale>
+
 
 namespace Parm
 {

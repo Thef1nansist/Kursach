@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "Header.h"
-#include <iostream>
 
 namespace FST
 {

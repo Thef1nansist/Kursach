@@ -1,9 +1,6 @@
 
 #include "pch.h"
 #include "Header.h"
-#include <iostream>
-#include <ctime>
-#include <fstream>
 
 #define W(x, y)  << std::setw(x) << (y) <<
 #define STR(n, line, type, id)\

@@ -1,19 +1,28 @@
 #include "pch.h"
 #include "Header.h"
-#include <cstring>
+
 
 using namespace std;
 namespace Polish
 {
-	int  getPriority(LT::Entry& e)
+	int  PriorityOperation(LT::Entry& ent)
 	{
-		switch (e.lexema)
+		switch (ent.lexema)
 		{
-		case LEX_LEFTHESIS: case LEX_RIGHTTHESIS: return 0;
-		case LEX_PLUS: case LEX_MINUS: return 1;
-		case LEX_STAR: case LEX_DIRSLASH: return 2;
-		case LEX_LEFT: case LEX_RIGHT: return 3;
-		default: return -1;
+		case LEX_LEFTSK:
+		case LEX_RIGHTSK:
+			return 0;
+		case LEX_PL:
+		case LEX_MINUS:
+			return 1;
+		case LEX_STAR:
+		case LEX_DIRSLASH:
+			return 2;
+		case LEX_LEFT:
+		case LEX_RIGHT:
+			return 3;
+		default:
+			return -1;
 		}
 	}
 
@@ -125,34 +134,34 @@ namespace Polish
 			if (ignore)	// вызов функции считаем подставляемым значением и заносим в результат
 			{
 				result.push_back(v[i]);
-				if (v[i].lexema == LEX_RIGHTTHESIS)
+				if (v[i].lexema == LEX_RIGHTSK)
 					ignore = false;
 				continue;
 			}
-			int priority = getPriority(v[i]); // его приоритет
+			int priority = PriorityOperation(v[i]); // его приоритет
 
-			if (v[i].lexema == LEX_LEFTHESIS || v[i].lexema == LEX_RIGHTTHESIS || v[i].lexema == LEX_PLUS || v[i].lexema == LEX_MINUS || v[i].lexema == LEX_STAR || v[i].lexema == LEX_DIRSLASH || v[i].lexema == LEX_LEFT || v[i].lexema == LEX_RIGHT)
+			if (v[i].lexema == LEX_LEFTSK || v[i].lexema == LEX_RIGHTSK || v[i].lexema == LEX_PL || v[i].lexema == LEX_MINUS || v[i].lexema == LEX_STAR || v[i].lexema == LEX_DIRSLASH || v[i].lexema == LEX_LEFT || v[i].lexema == LEX_RIGHT)
 			{
-				if (s.empty() || v[i].lexema == LEX_LEFTHESIS)
+				if (s.empty() || v[i].lexema == LEX_LEFTSK)
 				{
 					s.push(v[i]);
 					continue;
 				}
 
-				if (v[i].lexema == LEX_RIGHTTHESIS)
+				if (v[i].lexema == LEX_RIGHTSK)
 				{
 					//выталкивание элементов до  скобки
-					while (!s.empty() && s.top().lexema != LEX_LEFTHESIS)
+					while (!s.empty() && s.top().lexema != LEX_LEFTSK)
 					{
 						result.push_back(s.top());
 						s.pop();
 					}
-					if (!s.empty() && s.top().lexema == LEX_LEFTHESIS)
+					if (!s.empty() && s.top().lexema == LEX_LEFTSK)
 						s.pop();
 					continue;
 				}
 				//выталкивание элем с большим/равным приоритетом в результат
-				while (!s.empty() && getPriority(s.top()) >= priority)
+				while (!s.empty() && PriorityOperation(s.top()) >= priority)
 				{
 					result.push_back(s.top());
 					s.pop();
@@ -166,14 +175,18 @@ namespace Polish
 					ignore = true;
 				result.push_back(v[i]);	// операнд заносим в результирующий вектор
 			}
-			if (v[i].lexema != LEX_LEFTHESIS & v[i].lexema != LEX_RIGHTTHESIS & v[i].lexema != LEX_PLUS & v[i].lexema != LEX_MINUS & v[i].lexema != LEX_STAR & v[i].lexema != LEX_DIRSLASH & v[i].lexema != LEX_ID & v[i].lexema != LEX_LITERAL & v[i].lexema != LEX_LEFT & v[i].lexema != LEX_RIGHT)
+			if (v[i].lexema != LEX_LEFTSK & v[i].lexema != LEX_RIGHTSK & v[i].lexema != LEX_PL & v[i].lexema != LEX_MINUS & v[i].lexema != LEX_STAR & v[i].lexema != LEX_DIRSLASH & v[i].lexema != LEX_ID & v[i].lexema != LEX_LITERAL & v[i].lexema != LEX_LEFT & v[i].lexema != LEX_RIGHT)
 			{
 				Log::writeError(log.stream, Error::GetError(1));
 				return false;
 			}
 		}
 
-		while (!s.empty()) { result.push_back(s.top()); s.pop(); }
+		while (!s.empty())
+		{
+			result.push_back(s.top());
+			s.pop();
+		}
 		v = result;
 		return true;
 	}

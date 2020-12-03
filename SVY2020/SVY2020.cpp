@@ -1,16 +1,6 @@
 ﻿// Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
 #include "pch.h"
-#include "Log.h"
-#include "Error.h"
-#include "Parm.h"
-#include "LexAnaliz.h"
-#include "In.h"
-#include "IT.h"
-#include "LT.h"
-#include "PolishNotation.h"
-#include "SemAnaliz.h"
-#include "MFST.h"
-#include "Generator.h"
+
 using namespace std;
 int _tmain(int argc, _TCHAR* argv[])
 {
@@ -94,7 +84,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		LT::writeLexTable(&std::cout, tables.lextable);							//а также соответствие токенов и лексем
 		LT::writeLexemsOnLines(&std::cout, tables.lextable);
 
-		Gener::CodeGeneration(tables, parm, log);								//выполнить генерацию кода
+		Gener::EntryPoint(tables, parm, log);								//выполнить генерацию кода
 		Log::writeLine(log.stream, ALLGOOD, "");									//итог работы программы
 		Log::writeLine(&std::cout, ALLGOOD, "");
 		Log::Close(log);													    //закрыть журнал

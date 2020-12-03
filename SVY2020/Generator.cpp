@@ -1,13 +1,4 @@
 #include "pch.h"
-#include <iosfwd>
-#include "Generator.h"
-#include "Parm.h"
-#include "LexAnaliz.h"
-#include "IT.h"
-#include "LT.h"
-#include <sstream>
-#include <cstring>
-
 
 using namespace std;
 
@@ -15,293 +6,329 @@ namespace Gener
 {
 	static int conditionnum = 0;
 
-	string itoS(int x) { stringstream r;  r << x;  return r.str(); }
-	string genCallFuncCode(Lexer::LEX& tables, Log::LOG& log, int i)
+	string int_to_string(int valueofint)
 	{
-		string str;
-
-		IT::Entry e = ITENTRY(i); // идентификатор вызываемой функции
-		stack <IT::Entry> temp;
-		bool stnd = (e.idtype == IT::IDTYPE::S);
-
-		for (int j = i + 1; LEXEMA(j) != LEX_RIGHTTHESIS; j++)
-		{
-			if (LEXEMA(j) == LEX_ID || LEXEMA(j) == LEX_LITERAL)
-				temp.push(ITENTRY(j)); // // заполн€ем стек в пр€мом пор€дке	
-		}
-		str += "\n";
-
-		// раскручиваем стек
-		while (!temp.empty())
-		{
-			if (temp.top().idtype == IT::IDTYPE::L && temp.top().iddatatype == IT::IDDATATYPE::STR)
-				str = str + "push offset " + temp.top().id + "\n";
-			else   str = str + "push " + temp.top().id + "\n";
-			temp.pop();
-		}
-
-		if (stnd)
-			str += "push offset buffer\n";
-		str = str + "call " + string(e.id) + IN_CODE_ENDL;
-		// выравниваниe стека
-		/*if (e.value.params.count != 0) str = str + "add esp, " + itoS(4 * e.value.params.count + 4) + "\n";*/
-
-		return str;
+		stringstream valueofstring;
+		valueofstring << valueofint;
+		return valueofstring.str();
 	}
-	string genEqualCode(Lexer::LEX& tables, Log::LOG& log, int i)
-	{
-		string str;
-		IT::Entry e1 = ITENTRY(i - 1); // левый операнд
 
-		switch (e1.iddatatype)
+	string CallOfFunction(Lexer::LEX& tables, Log::LOG& log, int i)
+	{
+		stack <IT::Entry> IDs;
+		IT::Entry name_of_function = ENTRYIT(i); // идентификатор вызываемой функции
+		string stroka;
+
+		for (int j = i + 1; LEX_RIGHTSK != MYLEX(j); j++)
+			if (MYLEX(j) == LEX_ID || MYLEX(j) == LEX_LITERAL)
+				IDs.push(ENTRYIT(j)); // записываем в стек
+		stroka += "\n";
+
+		for (; !IDs.empty();) // разбираем стек
+		{
+			if (IDs.top().idtype == IT::IDTYPE::L && IDs.top().iddatatype == IT::IDDATATYPE::STR)
+				stroka = stroka + "push offset " + IDs.top().id + "\n";
+			else
+				stroka = stroka + "push " + IDs.top().id + "\n";
+
+			IDs.pop();
+		}
+
+		stroka = stroka + "call " + string(name_of_function.id) + IN_CODE_ENDL;
+
+		return stroka;
+	}
+	string EqualizationOfValue(Lexer::LEX& tables, Log::LOG& log, int i)
+	{
+
+		IT::Entry operandleft = ENTRYIT(i - 1);
+		string stroka;
+		switch (operandleft.iddatatype)
 		{
 		case IT::IDDATATYPE::NUM:
 		{
 			bool first = true;
-			for (int j = i + 1; LEXEMA(j) != LEX_SEPARATOR; j++)
+			for (int j = i + 1; MYLEX(j) != LEX_SEPARATOR; j++)
 			{
-				switch (LEXEMA(j))
+				switch (MYLEX(j))
 				{
 				case LEX_LITERAL:
 				case LEX_ID:
 				{
-					if (ITENTRY(j).idtype == IT::IDTYPE::F || ITENTRY(j).idtype == IT::IDTYPE::S) // если в выражении вызов функции
+					if (ENTRYIT(j).idtype == IT::IDTYPE::F || ENTRYIT(j).idtype == IT::IDTYPE::S) // если в выражении вызов функции
 					{
-						str = str + genCallFuncCode(tables, log, j); // функци€ возвращает результат в eax
-						str = str + "push eax\n";				// результат выражени€ в стек дл€ дальнейшего вычислени€ выражени€
-						while (LEXEMA(j) != LEX_RIGHTTHESIS) j++;
+						stroka += CallOfFunction(tables, log, j); //возврат в eax будет
+						stroka += "push eax\n";				// ну и тут мы снова добавл€ем результат в стек
+						while (MYLEX(j) != LEX_RIGHTSK)
+							j++;
 						break;
 					}
-					else  str = str + "push " + ITENTRY(j).id + "\n";
+					else
+						stroka = stroka + "push " + ENTRYIT(j).id + "\n";
 					break;
 				}
-				case LEX_PLUS:
-					str = str + "pop ebx\npop eax\nadd eax, ebx\npush eax\n"; break;
+				case LEX_PL:
+					stroka += "pop ebx\npop eax\nadd eax, ebx\npush eax\n";
+					break;
 				case LEX_MINUS:
-					str = str + "pop ebx\npop eax\nsub eax, ebx\npush eax\n"; break;
+					stroka += "pop ebx\npop eax\nsub eax, ebx\npush eax\n";
+					break;
 				case LEX_STAR:
-					str = str + "pop ebx\npop eax\nimul eax, ebx\npush eax\n"; break;
+					stroka += "pop ebx\npop eax\nimul eax, ebx\npush eax\n";
+					break;
 				case LEX_DIRSLASH:
-					str = str + "pop ebx\npop eax\ncdq\nidiv ebx\npush eax\n"; break;
+					stroka += "pop ebx\npop eax\ncdq\nidiv ebx\npush eax\n";
+					break;
 				case LEX_RIGHT:
-					str = str + "pop ebx \npop eax \nmov cl, bl \nshr eax, cl\npush eax\n"; break;
+					stroka += "pop ebx \npop eax \nmov cl, bl \nshr eax, cl\npush eax\n";
+					break;
 				case LEX_LEFT:
-					str = str + "pop ebx \npop eax \nmov cl, bl \nshl eax, cl\npush eax\n"; break;
+					stroka += "pop ebx \npop eax \nmov cl, bl \nshl eax, cl\npush eax\n";
+					break;
 				}
 			} // цикл вычислени€
 
-			str = str + "\npop ebx\nmov " + e1.id + ", ebx\n";			// вычисленное выражение в ebx 
+			stroka = stroka + "\npop ebx\nmov " + operandleft.id + ", ebx\n"; //теперь значение, которое получилось, запихиваем в регистр ebx
 			break;
 		}
 		case IT::IDDATATYPE::STR:// разрешить присваивать строкам только строки, литералы и вызовы функций
 		{
-			char lex = LEXEMA(i + 1);
-			IT::Entry e2 = ITENTRY(i + 1);
-			if (lex == LEX_ID && (e2.idtype == IT::IDTYPE::F || e2.idtype == IT::IDTYPE::S)) // вызов функции
+			char lexema = MYLEX(i + 1);
+			IT::Entry operandright = ENTRYIT(i + 1);
+			if ((operandright.idtype == IT::IDTYPE::F || operandright.idtype == IT::IDTYPE::S) && lexema == LEX_ID) // вызов функции
 			{
-				str += genCallFuncCode(tables, log, i + 1);
-				str = str + "mov " + e1.id + ", eax";
+				stroka += CallOfFunction(tables, log, i + 1);
+				stroka = stroka + "mov " + operandleft.id + ", eax";
 			}
-			else if (lex == LEX_LITERAL) // литерал
+			else if (lexema == LEX_LITERAL) // литерал
 			{
-				str = str + "mov " + e1.id + ", offset " + e2.id;
+				stroka = stroka + "mov " + operandleft.id + ", offset " + operandright.id;
 			}
 			else // ид(переменна€) - через регистр
 			{
-				str = str + "mov ecx, " + e2.id + "\nmov " + e1.id + ", ecx";
+				stroka = stroka + "mov ecx, " + operandright.id + "\nmov " + operandleft.id + ", ecx";
 			}
 		}
 		}
 
-		return str;
+		return stroka;
 	}
 	string genFunctionCode(Lexer::LEX& tables, int i, string funcname, int pcount)
 	{
-		string str;
-		IT::Entry e = ITENTRY(i + 1);
-		IT::IDDATATYPE type = e.iddatatype;
+		IT::Entry valueinlextable = ENTRYIT(i + 1);
+		string stroka;
 
-		str = SEPSTR(funcname) + string(e.id) + string(" PROC,\n\t");
+		stroka = SEPSTR(funcname) + string(valueinlextable.id) + string(" PROC,\n\t");
 		//дальше параметры
 		int j = i + 3; // начало - то что сразу после открывающей скобки
-		while (LEXEMA(j) != LEX_RIGHTTHESIS) // пока параметры не кончатс€
+		while (MYLEX(j) != LEX_RIGHTSK) // пока параметры не кончатс€
 		{
-			if (LEXEMA(j) == LEX_ID) // параметр
-				str = str + string(ITENTRY(j).id) + (ITENTRY(j).iddatatype == IT::IDDATATYPE::NUM ? " : sdword, " : " : dword, ");
+			if (MYLEX(j) == LEX_ID) // параметр
+				stroka = stroka + string(ENTRYIT(j).id) + (ENTRYIT(j).iddatatype == IT::IDDATATYPE::NUM ? " : sdword, " : " : dword, ");
 			j++;
 		}
-		int f = str.rfind(',');
+		int f = stroka.rfind(',');
 		if (f > 0)
-			str[f] = IN_CODE_SPACE;
+			stroka[f] = IN_CODE_SPACE;
 
-		str += "\n; --- save registers ---\npush ebx\npush edx\n; ----------------------";
+		stroka += "\n; ~~~~~~~~~ soxranit registers ~~~~~~~~ \npush ebx\npush edx\n; ~~~~~~~~~~~~~";
 
-		return str;
+		return stroka;
 	}
-	string genExitCode(Lexer::LEX& tables, int i, string funcname, int pcount)
+	string ExitCodeGener(Lexer::LEX& tables, int i, string funcname, int pcount)
 	{
-		string str = "; --- restore registers ---\npop edx\npop ebx\n; -------------------------\n";
-		if (LEXEMA(i + 1) != LEX_SEPARATOR)	// выход из функции (вернуть значение)
+		string stroka = "; ~~~~~ vostanovit registers ~~~~~~ \npop edx\npop ebx\n; ~~~~~~~~~~~~~~~~\n";
+		
+		if (MYLEX(i + 1) != LEX_SEPARATOR)	// выход из функции (вернуть значение)
 		{
-			str = str + "mov eax, " + string(ITENTRY(i + 1).id) + "\n";
+			stroka = stroka + "mov eax, " + string(ENTRYIT(i + 1).id) + "\n";
 		}
-		str += "ret\n";
-		str += funcname + " ENDP" + SEPSTREMP;
-		return str;
+		stroka += "ret\n";
+		stroka = stroka + funcname + " ENDP" + SEPSTREMP;
+		return stroka;
 	}
-	string genConditionCode(Lexer::LEX& tables, int i, string& cyclecode)
+	string StatusCodeFunc(Lexer::LEX& tables, int i, string& cyclecode)
 	{
-		string str;
+		bool ist = false, isf = false, cycle = false;
+		IT::Entry operanfleft = ENTRYIT(i + 1);
+		IT::Entry operandright = ENTRYIT(i + 3);
+		string stroka;
 		conditionnum++;
 		cyclecode.clear();
-		IT::Entry lft = ITENTRY(i + 1); // левый операнд
-		IT::Entry rgt = ITENTRY(i + 3); // правый операнд
-		bool w = false, r = false, c = false;
 		string wstr, rstr;
 
-		for (int j = i + 5; LEXEMA(j) != LEX_DIEZ; j++) // пропустили открывающую решетку
+		for (int j = i + 5; MYLEX(j) != LEX_DIEZ; j++) // пропустили открывающую решетку
 		{
-			if (LEXEMA(j) == LEX_ISTRUE) r = true;
-			if (LEXEMA(j) == LEX_ISFALSE) w = true;
-			if (LEXEMA(j) == LEX_CYCLE) c = true;
+			if (MYLEX(j) == LEX_ISTRUE)
+				isf = true;
+			if (MYLEX(j) == LEX_ISFALSE)
+				ist = true;
+			if (MYLEX(j) == LEX_CYCLE)
+				cycle = true;
 		}
-		str = str + "mov edx, " + lft.id + "\ncmp edx, " + rgt.id + "\n";
-		switch (LEXEMA(i + 2))
+		stroka = stroka + "mov edx, " + operanfleft.id + "\ncmp edx, " + operandright.id + "\n";
+		switch (MYLEX(i + 2))
 		{
-		case LEX_MORE:  rstr = "jg";  wstr = "jl";  break;
-		case LEX_LESS:   rstr = "jl";  wstr = "jg";  break;
-		case LEX_EQUALS:    rstr = "jz";  wstr = "jnz";  break;
-		case LEX_NOTEQUALS:   rstr = "jnz";  wstr = "jz";  break;
+		case LEX_MORE:  
+			rstr = "jg";  
+			wstr = "jl";  
+			break;
+		case LEX_LESS:   
+			rstr = "jl"; 
+			wstr = "jg";  
+			break;
+		case LEX_EQUALS:    
+			rstr = "jz";  
+			wstr = "jnz";  
+			break;
+		case LEX_NOTEQUALS:   
+			rstr = "jnz";  
+			wstr = "jz";  
+			break;
 		}
 
-		if (!c && r) str = str + "\n" + rstr + " right" + itoS(conditionnum);
-		if (!c && w) str = str + "\n" + wstr + " wrong" + itoS(conditionnum);
-		if (c)
+		if (!cycle && isf)
+			stroka = stroka + "\n" + rstr + " right" + int_to_string(conditionnum);
+		if (!cycle && ist)
+			stroka = stroka + "\n" + wstr + " wrong" + int_to_string(conditionnum);
+		if (cycle)
 		{
-			str = str + "\n" + rstr + " cycle" + itoS(conditionnum);
-			cyclecode = str;
-			str = str + "\njmp cyclenext" + itoS(conditionnum);
+			stroka = stroka + "\n" + rstr + " cycle" + int_to_string(conditionnum);
+			cyclecode = stroka;
+			stroka = stroka + "\njmp cyclenext" + int_to_string(conditionnum);
 		}
-		else if (!r || !w)  str = str + "\njmp next" + itoS(conditionnum);
-		return str;
+		else if (!isf || !ist)
+			stroka = stroka + "\njmp next" + int_to_string(conditionnum);
+		return stroka;
 	}
-	vector <string> startFillVector(Lexer::LEX& tables)
+	vector <string> PackVectorWithValues(Lexer::LEX& tables)
 	{
-		vector <string> v;
-		v.push_back(BEGIN);
-		v.push_back(EXTERN);
+		vector <string> mainvec;
+		vector <string> vectorforliteral;
+		vector <string> vectorforid;
 
-		vector <string> vlt;  vlt.push_back(CONST);
-		vector <string> vid;  vid.push_back(DATA);
+		mainvec.push_back(BEGIN);
+		mainvec.push_back(EXTERN); 
+		vectorforliteral.push_back(CONST);
+		vectorforid.push_back(DATA);
 
 		for (int i = 0; i < tables.idtable.size; i++)// const, data
 		{
-			IT::Entry e = tables.idtable.table[i];
-			string str = "\t\t" + string(e.id);
+			IT::Entry exv = tables.idtable.table[i];
+			string str = "\t\t" + string(exv.id);
 
 			if (tables.idtable.table[i].idtype == IT::IDTYPE::L)	// литерал - в .const
 			{
-				switch (e.iddatatype)
+				switch (exv.iddatatype)
 				{
-				case IT::IDDATATYPE::NUM:  str = str + " sdword " + itoS(e.value.vint);  break;
-				case IT::IDDATATYPE::STR:  str = str + " byte '" + string(e.value.vstr.str) + "', 0";  break;
+				case IT::IDDATATYPE::NUM:  
+					str = str + " sdword " + int_to_string(exv.value.vint);  
+					break;
+				case IT::IDDATATYPE::STR:  
+					str = str + " byte '" + string(exv.value.vstr.str) + "', 0";  
+					break;
 				}
-				vlt.push_back(str);
+				vectorforliteral.push_back(str);
 			}
 			else if (tables.idtable.table[i].idtype == IT::IDTYPE::V)// переменна€ - в .data
 			{
-				switch (e.iddatatype)
+				switch (exv.iddatatype)
 				{
-				case IT::IDDATATYPE::NUM: str = str + " sdword 0";  break;
-				case IT::IDDATATYPE::STR: str = str + " dword ?";  break;
+				case IT::IDDATATYPE::NUM: 
+					str = str + " sdword 0"; 
+					break;
+				case IT::IDDATATYPE::STR:
+					str = str + " dword ?";  
+					break;
 				}
-				vid.push_back(str);
+				vectorforid.push_back(str);
 			}
 		}
-		v.insert(v.end(), vlt.begin(), vlt.end());
-		v.insert(v.end(), vid.begin(), vid.end());
-		v.push_back(CODE);
-		return v;
+		mainvec.insert(mainvec.end(), vectorforliteral.begin(), vectorforliteral.end());
+		mainvec.insert(mainvec.end(), vectorforid.begin(), vectorforid.end());
+		mainvec.push_back(CODE);
+		return mainvec;
 	}
-	void CodeGeneration(Lexer::LEX& tables, Parm::PARM& parm, Log::LOG& log)
+	void EntryPoint(Lexer::LEX& tables, Parm::PARM& parm, Log::LOG& log)
 	{
-		vector <string> v = startFillVector(tables);
+		string functionname;
+		string cycle;
+		string str;//  cmp + j
+		int countofparm;
+		
+		vector <string> mainvector = PackVectorWithValues(tables);
 		ofstream ofile("D:\\Kursach\\SVY2020\\Generation\\Gen.asm");
-		string funcname;	// им€ текущей функции
-		string cyclecode;	// эпилог цикла: cmp + j
-		int pcount;			// количество параметров текущей функции
-		string str;
 
 		for (int i = 0; i < tables.lextable.size; i++)
 		{
-			switch (LEXEMA(i))
+			switch (MYLEX(i))
 			{
-			case LEX_MAIN:
+			case LEX_POEXALI:
 			{
-				str = str + SEPSTR("MAIN") + "main PROC";
+				str = str + SEPSTR("POEXALI") + "main PROC";
 				break;
 			}
-			case LEX_FUNCTION:
+			case LEX_OPERATION:
 			{
-				funcname = ITENTRY(i + 1).id;
-				pcount = ITENTRY(i + 1).value.params.count;
-				str = genFunctionCode(tables, i, funcname, pcount);
+				functionname = ENTRYIT(i + 1).id;
+				countofparm = ENTRYIT(i + 1).value.params.count;
+				str = genFunctionCode(tables, i, functionname, countofparm);
 				break;
 			}
-			case LEX_RETURN:
+			case LEX_CONCLUSION:
 			{
-				str = genExitCode(tables, i, funcname, pcount);
+				str = ExitCodeGener(tables, i, functionname, countofparm);
 				break;
 			}
 			case LEX_ID: // вызов функции
 			{
-				if (LEXEMA(i + 1) == LEX_LEFTHESIS && LEXEMA(i - 1) != LEX_FUNCTION) // не объ€вление, а вызов
-					str = genCallFuncCode(tables, log, i);
+				if (MYLEX(i + 1) == LEX_LEFTSK && MYLEX(i - 1) != LEX_OPERATION) // не объ€вление, а вызов
+					str = CallOfFunction(tables, log, i);
 				break;
 			}
 			case LEX_CONDITION: // условие
 			{
-				str = genConditionCode(tables, i, cyclecode);
+				str = StatusCodeFunc(tables, i, cycle);
 				break;
 			}
 			case LEX_BRACELET:	// переход на метку в конце кондишна
 			{
-				if (LEXEMA(i + 1) == LEX_ISFALSE || LEXEMA(i + 1) == LEX_ISTRUE)
-					str = str + "jmp next" + itoS(conditionnum);
+				if (MYLEX(i + 1) == LEX_ISFALSE || MYLEX(i + 1) == LEX_ISTRUE)
+					str = str + "jmp next" + int_to_string(conditionnum);
 			}
 			case LEX_DIEZ:		// поставить метки в конце кондишна
 			{
-				if (LEXEMA(i - 1) == LEX_BRACELET) //   ]#
+				if (MYLEX(i - 1) == LEX_BRACELET) //   ]#
 				{
 					bool c = false;
-					for (int j = i; j > 0 && LEXEMA(j) != LEX_CONDITION; j--)
-						if (LEXEMA(j) == LEX_CYCLE)
+					for (int j = i; j > 0 && MYLEX(j) != LEX_CONDITION; j--)
+						if (MYLEX(j) == LEX_CYCLE)
 							c = true;
 					if (c)
-						str = cyclecode + "\ncyclenext" + itoS(conditionnum) + ":";
-					else  str += "next" + itoS(conditionnum) + ":";
+						str = cycle + "\ncyclenext" + int_to_string(conditionnum) + ":";
+					else  str += "next" + int_to_string(conditionnum) + ":";
 				}
 				break;
 			}
 			case LEX_ISTRUE: // условие верно(метка)
 			{
-				str = str + "right" + itoS(conditionnum) + ":";
+				str = str + "right" + int_to_string(conditionnum) + ":";
 				break;
 			}
 			case LEX_ISFALSE: // условие неверно(метка)
 			{
-				str = str + "wrong" + itoS(conditionnum) + ":";
+				str = str + "wrong" + int_to_string(conditionnum) + ":";
 				break;
 			}
 			case LEX_CYCLE: // цикл с условием (метка)
 			{
-				str = str + "cycle" + itoS(conditionnum) + ":";
+				str = str + "cycle" + int_to_string(conditionnum) + ":";
 				break;
 			}
 			case LEX_EQUAL: // присваивание (вычисление выражений)
 			{
-				str = genEqualCode(tables, log, i);
-				while (LEXEMA(++i) != LEX_SEPARATOR);	// пропускаем выражение
+				str = EqualizationOfValue(tables, log, i);
+				while (MYLEX(++i) != LEX_SEPARATOR);	// пропускаем выражение
 				break;
 			}
 			case LEX_NEWLINE: // перевод строки 
@@ -311,7 +338,7 @@ namespace Gener
 			}
 			case LEX_WRITE: // вывод
 			{
-				IT::Entry e = ITENTRY(i + 1);
+				IT::Entry e = ENTRYIT(i + 1);
 				switch (e.iddatatype)
 				{
 				case IT::IDDATATYPE::NUM:
@@ -328,12 +355,12 @@ namespace Gener
 			}
 
 			if (!str.empty())
-				v.push_back(str);
+				mainvector.push_back(str);
 			str.clear();
 		}
-		v.push_back(END);
+		mainvector.push_back(END);
 		// вывод в файл
-		for (auto x : v)
+		for (auto x : mainvector)
 			ofile << x << endl;
 		ofile.close();
 	}

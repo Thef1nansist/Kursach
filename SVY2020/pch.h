@@ -14,6 +14,29 @@
 #include <vector>
 #include <stack>
 
+//Для Generator.cpp
+#include <iosfwd>
+#include "Generator.h"
+#include "Parm.h"
+#include "LexAnaliz.h"
+#include "IT.h"
+#include "LT.h"
+#include <sstream>
+#include <cstring>
+
+//Для лексического анализа
+#include "Graphs.h"
+
+//
+#include "Error.h"
+#include "SemAnaliz.h"
+
+// для мэина
+#include "Log.h"
+#include "In.h"
+#include "PolishNotation.h"
+#include "MFST.h"
+
 
 
 //#define MFST_TRACE_ON

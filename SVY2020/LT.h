@@ -4,17 +4,17 @@
 #define	LEX_ID_TYPE    	 't'	// типы данных		
 #define	LEX_ID			 'i'	// идентификаторы		
 #define	LEX_LITERAL		 'l'	// литералы		
-#define	LEX_FUNCTION     'f'	// function		
-#define	LEX_MAIN		 'm'	// main		
+#define	LEX_OPERATION    'f'	// function		
+#define	LEX_POEXALI		 'm'	// ƒл€ главной функции (main)
 #define	LEX_SEPARATOR	 ';'	// разделитель инструкций
 #define	LEX_COMMA		 ','	// разделитель параметров 		
 #define	LEX_LEFTBRACE	 '['	// начало блока		
 #define	LEX_BRACELET	 ']'	// конец блока		
 #define LEX_LEFT         '{'    //сдвиг влево
 #define LEX_RIGHT        '}'    //сдвиг вправо
-#define	LEX_LEFTHESIS	 '('	// начало списка параметров		
-#define	LEX_RIGHTTHESIS	 ')'	// конец списка параметров		
-#define	LEX_PLUS		 '+'	// сложение	
+#define	LEX_LEFTSK		 '('	// начало списка параметров		
+#define	LEX_RIGHTSK 	 ')'	// конец списка параметров		
+#define	LEX_PL			 '+'	// сложение	
 #define	LEX_MINUS		 '-'	// вычитание
 #define	LEX_STAR		 '*'	// умножение
 #define LEX_DIRSLASH	 '/'	// деление
@@ -27,9 +27,9 @@
 #define LEX_CYCLE		 'c'	// цикл
 #define LEX_WRITE		 'o'	// вывод
 #define LEX_NEWLINE		 '^'	// перевод строки
-#define LEX_RETURN		 'e'	// выход из процедуры/функции
+#define LEX_CONCLUSION	 'e'	// ¬ыход из функции, процедуры
 #define LEX_PROCEDURE	 'p'	// ключевое слово процедуры
-#define LEX_NEW			 'n'	// объ€влени€ переменных
+#define LEX_NOW			 'n'	// ƒл€ объ€влени€ новых переменных
 #define LEX_MORE		 '>'	// проверка на больше
 #define LEX_LESS		 '<'	// проверка на меньше
 #define LEX_EQUALS		 '&'	// проверка на равенство

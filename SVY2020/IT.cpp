@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "Header.h"
-#include <iomanip>
 #define W(x, y)\
 		<< std::setw(x) << (y) <<
 #define STR(n, line, type, id)\

@@ -9,7 +9,7 @@
 #define TYPE_PROCEDURE	"procedure"
 #define CONCAT			"concat"
 #define ATOII			"atoii"
-#define MAIN			"main"
+#define POEXALI			"poexali"
 #define LENGHT			"lenght"
 
 

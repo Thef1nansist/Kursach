@@ -1,8 +1,4 @@
 #include "pch.h"
-#include <iostream>
-#include <iomanip>
-#include "LexAnaliz.h"
-#include "LT.h"
 namespace LT
 {
 	Entry::Entry()

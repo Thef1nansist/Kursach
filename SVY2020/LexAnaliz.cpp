@@ -1,8 +1,4 @@
 #include "pch.h"
-#include "LexAnaliz.h"
-#include "Graphs.h"
-#include<stack>
-#include<string>
 
 int DecimicalNotation(std::string input, int scaleofnot) {
 	std::string num = input.substr(1, input.size());
@@ -15,13 +11,13 @@ namespace Lexer
 		{ LEX_SEPARATORS, FST::FST(GRAPH_SEPARATORS) },
 		{ LEX_LITERAL, FST::FST(GRAPH_INT_LITERAL) },
 		{ LEX_LITERAL, FST::FST(GRAPH_STRING_LITERAL) },
-		{ LEX_NEW, FST::FST(GRAPH_NEW) },
-		{ LEX_MAIN, FST::FST(GRAPH_MAIN) },
+		{ LEX_NOW, FST::FST(GRAPH_NOW) },
+		{ LEX_POEXALI, FST::FST(GRAPH_POEXALI) },
 		{ LEX_ID_TYPE, FST::FST(GRAPH_NUMBER) },
 		{ LEX_ID_TYPE, FST::FST(GRAPH_STRING) },
-		{ LEX_FUNCTION, FST::FST(GRAPH_FUNCTION) },
+		{ LEX_OPERATION, FST::FST(GRAPH_OPERATION) },
 		{ LEX_PROCEDURE, FST::FST(GRAPH_PROCEDURE) },
-		{ LEX_RETURN, FST::FST(GRAPH_RETURN) },
+		{ LEX_CONCLUSION, FST::FST(GRAPH_CONCLUSION) },
 		{ LEX_WRITE, FST::FST(GRAPH_WRITE) },
 		{ LEX_NEWLINE, FST::FST(GRAPH_NEWLINE) },
 		{ LEX_CONDITION, FST::FST(GRAPH_CONDITION) },
@@ -31,16 +27,19 @@ namespace Lexer
 		{ LEX_LITERAL_NUMO, FST::FST(GRAPH_V_LITERAL) },
 		{ LEX_ID, FST::FST(GRAPH_ID) }
 	};
-
+	
 	char* getScopeName(IT::IdTable idtable, char* prevword) // имя текущей области видимости (если находимся внутри блока)
 	{
-		char* a = new char[5];
-		a[0] = 'm';
-		a[1] = 'a';
-		a[2] = 'i';
-		a[3] = 'n';
-		a[4] = '\0';
-		if (strcmp(prevword, MAIN) == 0)
+		char* a = new char[8];
+		a[0] = 'p';
+		a[1] = 'o';
+		a[2] = 'e';
+		a[3] = 'x';
+		a[4] = 'a';
+		a[5] = 'l';
+		a[6] = 'i';
+		a[7] = '\0';
+		if (strcmp(prevword, POEXALI) == 0)
 			return a;
 		for (int i = idtable.size - 1; i >= 0; i--)
 			if (idtable.table[i].idtype == IT::IDTYPE::F)
@@ -122,7 +121,7 @@ namespace Lexer
 	{
 		static int literalNumber = 1;
 		char* buf = new char[SCOPED_ID_MAXSIZE], num[3];
-		strcpy_s(buf, MAXSIZE_ID, "LTRL");
+		strcpy_s(buf, MAXSIZE_ID, "VALS");
 		_itoa_s(literalNumber++, num, 10);
 		strcat(buf, num);
 		return buf;
@@ -233,13 +232,13 @@ namespace Lexer
 		// -------------------------------------------------------
 		int i = tables.lextable.size; // индекс в ТЛ текущего ИД
 
-		if (i > 1 && itentry->idtype == IT::IDTYPE::V && tables.lextable.table[i - 2].lexema != LEX_NEW)
+		if (i > 1 && itentry->idtype == IT::IDTYPE::V && tables.lextable.table[i - 2].lexema != LEX_NOW)
 		{
-			// в объявлении отсутствует ключевое слово new
+			// в объявлении отсутствует ключевое слово now
 			Log::writeError(log.stream, Error::GetError(304, line, 0));
 			lex_ok = false;
 		}
-		if (i > 1 && itentry->idtype == IT::IDTYPE::F && tables.lextable.table[i - 1].lexema != LEX_FUNCTION)
+		if (i > 1 && itentry->idtype == IT::IDTYPE::F && tables.lextable.table[i - 1].lexema != LEX_OPERATION)
 		{
 			// в объявлении не указан тип функции
 			Log::writeError(log.stream, Error::GetError(303, line, 0));
@@ -284,17 +283,17 @@ namespace Lexer
 					char lexema = graphs[j].lexema;
 					switch (lexema)
 					{
-					case LEX_MAIN:
+					case LEX_POEXALI:
 						enterPoint++;
 						break;
 					case LEX_SEPARATORS:
 					{
 						switch (*curword)
 						{
-						case LEX_LEFTHESIS:		// открывающая скобка - параметры  функции
+						case LEX_LEFTSK:		// открывающая скобка - параметры  функции
 						{
 							isParam = true;
-							if (*nextword == LEX_RIGHTTHESIS || ISTYPE(nextword))
+							if (*nextword == LEX_RIGHTSK || ISTYPE(nextword))
 							{
 								char* functionname = new char[MAXSIZE_ID];
 								char* scopename = getScopeName(tables.idtable, in.words[i - 1].word);
@@ -305,15 +304,15 @@ namespace Lexer
 							}
 							break;
 						}
-						case LEX_RIGHTTHESIS:	// закрывающая скобка
+						case LEX_RIGHTSK:	// закрывающая скобка
 						{
 							isParam = false;
 							// конец области видимости
-							if (*in.words[i - 1].word == LEX_LEFTHESIS || (i > 2 && (tables.lextable.table[tables.lextable.size - 2].lexema == LEX_ID_TYPE)))
+							if (*in.words[i - 1].word == LEX_LEFTSK || (i > 2 && (tables.lextable.table[tables.lextable.size - 2].lexema == LEX_ID_TYPE)))
 								scopes.pop();
 							break;
 						}
-						case LEX_LEFTBRACE:		// начало области видимости
+						case LEX_LEFTBRACE:		// start area view
 						{
 							if (i > 0 && *in.words[i - 1].word == LEX_ISFALSE || *in.words[i - 1].word == LEX_ISTRUE || *in.words[i - 1].word == LEX_CYCLE)
 								break;
@@ -324,10 +323,10 @@ namespace Lexer
 							scopes.push(functionname);
 							break;
 						}
-						case LEX_BRACELET:		// конец области видимости
+						case LEX_BRACELET:		// exit area view
 						{
-							// только в этом случае закрываем область видимости
-							if (*in.words[i + 1].word == LEX_ID_TYPE || *in.words[i + 1].word == LEX_PROCEDURE || *in.words[i + 1].word == LEX_MAIN)
+							
+							if (*in.words[i + 1].word == LEX_ID_TYPE || *in.words[i + 1].word == LEX_PROCEDURE || *in.words[i + 1].word == LEX_POEXALI)
 							{
 								if (!scopes.empty())
 									scopes.pop();
@@ -357,10 +356,10 @@ namespace Lexer
 					{
 						char id[STR_MAXSIZE] = "";
 						idxTI = NULLDX_TI;  // индекс идентификатора в ТИ
-						if (*nextword == LEX_LEFTHESIS)
+						if (*nextword == LEX_LEFTSK)
 							isFunc = true;						// идентификатор функции
 						char* idtype = (isFunc && i > 1) ?	// тип идентификатора
-							in.words[i - 2].word : in.words[i - 1].word;		// пропускаем ключевое слово function
+							in.words[i - 2].word : in.words[i - 1].word;		// пропускаем ключевое слово operation
 						if (!isFunc && !scopes.empty())
 							strncpy_s(id, scopes.top(), MAXSIZE_ID);
 						strncat(id, curword, MAXSIZE_ID);
@@ -376,7 +375,7 @@ namespace Lexer
 								{
 									itentry->value.params.count = NULL;
 									itentry->value.params.types = new IT::IDDATATYPE[MAX_PARAMS_COUNT];
-									for (int k = i; in.words[k].word[0] != LEX_RIGHTTHESIS; k++)
+									for (int k = i; in.words[k].word[0] != LEX_RIGHTSK; k++)
 									{
 										if (k == In::InWord::size || in.words[k].word[0] == LEX_SEPARATOR)
 											break;
@@ -399,8 +398,8 @@ namespace Lexer
 						else // повторный идентификатор (уже есть)
 						{
 							int i = tables.lextable.size - 1; // попытка переопределить идентификатор
-							if (i > 0 && tables.lextable.table[i - 1].lexema == LEX_NEW || tables.lextable.table[i].lexema == LEX_NEW
-								|| tables.lextable.table[i - 1].lexema == LEX_FUNCTION || tables.lextable.table[i].lexema == LEX_FUNCTION
+							if (i > 0 && tables.lextable.table[i - 1].lexema == LEX_NOW || tables.lextable.table[i].lexema == LEX_NOW
+								|| tables.lextable.table[i - 1].lexema == LEX_OPERATION || tables.lextable.table[i].lexema == LEX_OPERATION
 								|| tables.lextable.table[i - 1].lexema == LEX_ID_TYPE || tables.lextable.table[i].lexema == LEX_ID_TYPE
 								|| tables.lextable.table[i - 1].lexema == LEX_PROCEDURE || tables.lextable.table[i].lexema == LEX_PROCEDURE)
 							{

@@ -1,9 +1,5 @@
 #include "pch.h"
-#include "IT.h"
-#include "LT.h"
-#include "Error.h"
-#include "LexAnaliz.h"
-#include "SemAnaliz.h"
+
 
 namespace Semantic
 {
@@ -15,7 +11,7 @@ namespace Semantic
 		{
 			switch (tables.lextable.table[i].lexema)
 			{
-			case LEX_NEW:
+			case LEX_NOW:
 			{
 				if (tables.lextable.table[i + 1].lexema != LEX_ID_TYPE)
 				{
@@ -77,13 +73,13 @@ namespace Semantic
 								}
 							}
 							// если лексема сразу после идентиф скобка - это вызов функции
-							if (tables.lextable.table[k + 1].lexema == LEX_LEFTHESIS)
+							if (tables.lextable.table[k + 1].lexema == LEX_LEFTSK)
 							{
 								ignore = true;
 								continue;
 							}
 							// закрывающая скобка после списка параметров
-							if (ignore && tables.lextable.table[k + 1].lexema == LEX_RIGHTTHESIS)
+							if (ignore && tables.lextable.table[k + 1].lexema == LEX_RIGHTSK)
 							{
 								ignore = false;
 								continue;
@@ -92,7 +88,7 @@ namespace Semantic
 						if (lefttype == IT::IDDATATYPE::STR) // справа только литерал, ид или вызов строковой ф-ции
 						{
 							char l = tables.lextable.table[k].lexema;
-							if (l == LEX_PLUS || l == LEX_MINUS || l == LEX_STAR) // выражения недопустимы
+							if (l == LEX_PL || l == LEX_MINUS || l == LEX_STAR) // выражения недопустимы
 							{
 								Log::writeError(log.stream, Error::GetError(316, tables.lextable.table[k].sn, 0));
 								sem_ok = false;
@@ -107,14 +103,14 @@ namespace Semantic
 			{
 				IT::Entry e = tables.idtable.table[tables.lextable.table[i].idxTI];
 
-				if (i > 0 && tables.lextable.table[i - 1].lexema == LEX_FUNCTION)
+				if (i > 0 && tables.lextable.table[i - 1].lexema == LEX_OPERATION)
 				{
 					if (e.idtype == IT::IDTYPE::F) //функция, не процедура
 					{
 						for (int k = i + 1; ; k++)
 						{
 							char l = tables.lextable.table[k].lexema;
-							if (l == LEX_RETURN)
+							if (l == LEX_CONCLUSION)
 							{
 								int next = tables.lextable.table[k + 1].idxTI; // след. за return
 								if (next != NULLIDX_TI)
@@ -134,13 +130,13 @@ namespace Semantic
 						}
 					}
 				}
-				if (tables.lextable.table[i + 1].lexema == LEX_LEFTHESIS && tables.lextable.table[i - 1].lexema != LEX_FUNCTION) // именно вызов
+				if (tables.lextable.table[i + 1].lexema == LEX_LEFTSK && tables.lextable.table[i - 1].lexema != LEX_OPERATION) // именно вызов
 				{
 					if (e.idtype == IT::IDTYPE::F || e.idtype == IT::IDTYPE::S) // точно функция
 					{
 						int paramscount = NULL;
 						// проверка передаваемых параметров
-						for (int j = i + 1; tables.lextable.table[j].lexema != LEX_RIGHTTHESIS; j++)
+						for (int j = i + 1; tables.lextable.table[j].lexema != LEX_RIGHTSK; j++)
 						{
 							// проверка соответствия передаваемых параметров прототипам
 							if (tables.lextable.table[j].lexema == LEX_ID || tables.lextable.table[j].lexema == LEX_LITERAL)
@@ -176,7 +172,10 @@ namespace Semantic
 				}
 				break;
 			}
-			case LEX_MORE:	case LEX_LESS: case LEX_EQUALS:   case LEX_NOTEQUALS:
+			case LEX_MORE:	
+			case LEX_LESS: 
+			case LEX_EQUALS:   
+			case LEX_NOTEQUALS:
 			{
 				// левый и правый операнд - числовой тип
 				bool flag = true;

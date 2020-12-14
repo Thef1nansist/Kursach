@@ -34,4 +34,5 @@
 namespace Gener
 {
 	void EntryPoint(Lexer::LEX& tables, Parm::PARM& parm, Log::LOG& log);
+	void idrename(IT::IdTable& table);
 };

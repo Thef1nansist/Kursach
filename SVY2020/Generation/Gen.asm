@@ -21,121 +21,118 @@ ExitProcess PROTO:DWORD
 		newline byte 13, 10, 0
 		VALS1 byte 'LenghtA:', 0
 		VALS2 byte 'concat:', 0
-		VALS3 sdword 127
+		VALS3 sdword 9
 		VALS4 sdword -9
 		VALS5 byte 'Nebeute ', 0
 		VALS6 byte 'pogaluista', 0
-		VALS7 byte '10November', 0
+		VALS7 byte '15December', 0
 		VALS8 byte 'iz srtoki v chislo:', 0
-		VALS9 sdword 1
-		VALS10 byte 'sdvig vlevo:', 0
-		VALS11 sdword 5
-		VALS12 sdword 82
-		VALS13 byte ' ', 0
-		VALS14 sdword 3
-		VALS15 sdword 2
+		VALS9 sdword 40
+		VALS10 sdword 1
+		VALS11 byte 'sdvig vlevo:', 0
+		VALS12 sdword 5
+		VALS13 sdword 82
+		VALS14 byte ' ', 0
+		VALS15 sdword 3
+		VALS16 sdword 2
 .data
 		temp sdword ?
 		buffer byte 256 dup(0)
-		standforlen sdword 0
-		standstr dword ?
-		minres sdword 0
+		mulforlen sdword 0
+		mulstr dword ?
+		minresult sdword 0
 		poexalix sdword 0
 		poexaliy sdword 0
-		poexalistrx dword ?
-		poexalistry dword ?
-		poexalistrz dword ?
-		poexalie sdword 0
-		poexalit sdword 0
+		poexalistrokx dword ?
+		poexalistroky dword ?
+		poexalistrokz dword ?
+		poexalichil sdword 0
+		poexalitemp sdword 0
+		poexalipre sdword 0
 		poexaliresult sdword 0
-		poexaliab sdword 0
-		poexalid sdword 0
+		poexalixru sdword 0
 .code
 
-;~~~~~~~~~~ stand ~~~~~~~~~~~~
-stand PROC,
-	standa : dword, standb : dword  
-; ~~~~~~~~~ soxranit registers ~~~~~~~~ 
+;~~~~~~~~~~ mul0 ~~~~~~~~~~~~
+mul0 PROC,
+	mulada : dword, mulbred : dword  
 push ebx
 push edx
-; ~~~~~~~~~~~~~
 
-push standa
+
+push mulada
 call lenght
 push eax
 
 pop ebx
-mov standforlen, ebx
+mov mulforlen, ebx
 
 
 push offset VALS1
 call outstr
 
 
-push standforlen
+push mulforlen
 call outnum
 
 push offset newline
 call outstr
 
 
-push standb
-push standa
+push mulbred
+push mulada
 call concat
-mov standstr, eax
+mov mulstr, eax
 
 push offset VALS2
 call outstr
 
 
-push standstr
+push mulstr
 call outstr
 
 push offset newline
 call outstr
 
-; ~~~~~ vostanovit registers ~~~~~~ 
+
 pop edx
 pop ebx
-; ~~~~~~~~~~~~~~~~
 ret
-stand ENDP
+mul0 ENDP
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-;~~~~~~~~~~ min ~~~~~~~~~~~~
-min PROC,
+;~~~~~~~~~~ min1 ~~~~~~~~~~~~
+min1 PROC,
 	minx : sdword, miny : sdword  
-; ~~~~~~~~~ soxranit registers ~~~~~~~~ 
 push ebx
 push edx
-; ~~~~~~~~~~~~~
+
 mov edx, minx
 cmp edx, miny
 
 jl right1
-jg wrong1
+jge wrong1
 right1:
 push minx
 
 pop ebx
-mov minres, ebx
+mov minresult, ebx
 
 jmp next1
 wrong1:
 push miny
 
 pop ebx
-mov minres, ebx
+mov minresult, ebx
 
 next1:
-; ~~~~~ vostanovit registers ~~~~~~ 
+
 pop edx
 pop ebx
-; ~~~~~~~~~~~~~~~~
-mov eax, minres
+mov eax, minresult
 ret
-min ENDP
+min1 ENDP
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -151,23 +148,23 @@ push VALS4
 pop ebx
 mov poexaliy, ebx
 
-mov poexalistrx, offset VALS5
-mov poexalistry, offset VALS6
-mov poexalistrz, offset VALS7
+mov poexalistrokx, offset VALS5
+mov poexalistroky, offset VALS6
+mov poexalistrokz, offset VALS7
 
 push offset VALS8
 call outstr
 
 
-push poexalistrz
+push poexalistrokz
 call atoii
 push eax
 
 pop ebx
-mov poexalie, ebx
+mov poexalichil, ebx
 
 
-push poexalie
+push poexalichil
 call outnum
 
 push offset newline
@@ -175,6 +172,23 @@ call outstr
 
 push poexalix
 push VALS9
+pop ebx
+pop eax
+sub eax, ebx
+push eax
+
+pop ebx
+mov poexalipre, ebx
+
+
+push poexalipre
+call outnum
+
+push offset newline
+call outstr
+
+push poexalix
+push VALS10
 pop ebx 
 pop eax 
 mov cl, bl 
@@ -185,7 +199,7 @@ pop ebx
 mov poexaliresult, ebx
 
 
-push offset VALS10
+push offset VALS11
 call outstr
 
 
@@ -198,77 +212,73 @@ call outstr
 
 push poexaliy
 push poexalix
-call min
+call min1
 push eax
 
 pop ebx
-mov poexalit, ebx
+mov poexalitemp, ebx
 
 
-push poexalit
+push poexalitemp
 call outnum
 
 push offset newline
 call outstr
 
-push VALS11
+push VALS12
 
 pop ebx
-mov poexaliab, ebx
+mov poexalixru, ebx
 
+mov edx, poexalixru
+cmp edx, VALS13
 
-pop ebx
-mov poexalid, ebx
-
-mov edx, poexaliab
-cmp edx, VALS12
-
-jnz cycle2
+jl cycle2
 jmp cyclenext2
 cycle2:
 
-push poexaliab
+push poexalixru
 call outnum
 
 
-push offset VALS13
+push offset VALS14
 call outstr
 
-push poexaliab
-push VALS14
+push poexalixru
+push VALS15
 pop ebx
 pop eax
 add eax, ebx
 push eax
-push VALS15
+push VALS16
 pop ebx
 pop eax
 imul eax, ebx
 push eax
 
 pop ebx
-mov poexaliab, ebx
+mov poexalixru, ebx
 
-mov edx, poexaliab
-cmp edx, VALS12
+mov edx, poexalixru
+cmp edx, VALS13
 
-jnz cycle2
+jl cycle2
 cyclenext2:
 
-push offset VALS13
+push offset VALS14
 call outstr
 
 
-push poexaliab
+push poexalixru
 call outnum
 
 push offset newline
 call outstr
 
 
-push poexalistry
-push poexalistrx
-call stand
+push poexalistroky
+push poexalistrokx
+call mul0
 
 push 0
 call ExitProcess

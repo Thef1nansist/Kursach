@@ -5,35 +5,35 @@
 
 namespace FST
 {
-	struct RELATION		// ребро: символ -> вершина графов переходов КА
+	struct RELATION		
 	{
-		char  symbol;	// символ перехода
-		short nnode;	// номер смежной вершины
+		char  symbol;	
+		short nnode;	
 		RELATION(
-			char c,		// символ перехода
-			short ns	// новое состояние
+			char c,		
+			short ns	
 		);
 	};
 
-	struct NODE					//вершина графа переходов
+	struct NODE					
 	{
-		short n_relation;		//количество инциндентных ребер
-		RELATION* relations;	//инциндентные ребра
-		NODE();					//конструктор без параметров
-		NODE(short n, RELATION rel, ...);  //количество инциндентных ребер, список ребер
+		short n_relation;		
+		RELATION* relations;	
+		NODE();					
+		NODE(short n, RELATION rel, ...);  
 	};
 
-	struct FST   //недетерминированный конечный автомат
+	struct FST   
 	{
-		char* string;				//цепочка(строка, завершается 0х00)
-		short position;				//текущая позиция в цепочке
-		short nstates;				//количество состояний автомата
-		NODE* node;					//граф переходов:[0]-начальное состояние, [nstate-1]-конечное
-		short* rstates;				//возможные состояния автомата на данной позиции
-		FST(short ns, NODE n, ...); // (массив)количество состояний автомата, список состояний(граф переходов)
-		FST(char* s, FST& fst);		// количество состояний автомата, список состояний(граф переходов)
+		char* string;				
+		short position;				
+		short nstates;				
+		NODE* node;					
+		short* rstates;				
+		FST(short ns, NODE n, ...); 
+		FST(char* s, FST& fst);		
 	};
 
-	bool execute(FST& fst); //выполнить распознование цепочки
+	bool execute(FST& fst); 
 };
 

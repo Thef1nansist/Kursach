@@ -1,0 +1,63 @@
+procedure operation mul(string ada, string bred)
+[
+	now number forlen;
+	forlen = lenght(ada);
+        zapishi "LenghtA:";
+	zapishi forlen;
+	newline;
+	now string str;
+	str = concat(ada,bred);
+        zapishi "concat:";
+	zapishi str;
+	newline;
+        
+	conclusion;
+]
+number operation min(number x, number y)
+[
+	now number result;
+	condition: x < y #
+	istrue [result = x;]
+	isfalse [result = y;]#
+	conclusion result;
+]
+poexali
+[
+	now number x = 9;
+	now number y = -9;
+	now string strokx = "Nebeute ";
+	now string stroky = "pogaluista";
+        now string strokz = "15December";
+        now number chil;
+	now number temp;
+        zapishi "iz srtoki v chislo:";
+        chil = atoii(strokz);
+        zapishi chil;
+	newline;
+	now number pre;
+	pre = x - 40 ;
+	zapishi pre;
+        newline;
+        now number result;
+        result = x{1;
+        zapishi "sdvig vlevo:";
+        zapishi result;
+        newline;
+	temp = min (x,y);
+        zapishi temp;
+	newline;
+	now number xru = 5;
+	condition: xru < 82 #
+	cicle [
+		zapishi xru;
+		zapishi " ";
+		xru = (xru + 3)*2;
+	]#
+	zapishi " ";
+	zapishi xru;
+	newline;
+	mul(strokx,stroky);
+]
+
+
+

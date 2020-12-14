@@ -10,7 +10,7 @@ namespace Parm
 
 		for (int i = 1; i < argc; i++)
 		{
-			// превышена длина входного параметра
+			
 			if (wcslen(argv[i]) > PARM_MAX_SIZE)   throw ERROR_THROW(101)
 			else
 			{
@@ -24,7 +24,7 @@ namespace Parm
 		}
 
 		if (*parm.in == NULL)
-			throw ERROR_THROW(100); // параметр должен быть задан
+			throw ERROR_THROW(100); 
 
 		if (*parm.out == NULL)
 		{

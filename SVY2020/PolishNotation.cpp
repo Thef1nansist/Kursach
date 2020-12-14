@@ -29,30 +29,30 @@ namespace Polish
 	bool PolishNotation(Lexer::LEX& tbls, Log::LOG& log)
 	{
 		unsigned curExprBegin = 0;
-		ltvec v; // вектор элементов таблицы лексем
+		ltvec v; 
 		LT::LexTable new_table = LT::Create(tbls.lextable.maxsize);
-		intvec vpositions = getExprPositions(tbls); // позиции начала выражений
+		intvec vpositions = getExprPositions(tbls); 
 
 		for (int i = 0; i < tbls.lextable.size; i++)
 		{
-			if (curExprBegin < vpositions.size() && i == vpositions[curExprBegin]) // дошли до следующего начала выражения
+			if (curExprBegin < vpositions.size() && i == vpositions[curExprBegin]) 
 			{
-				int lexcount = fillVector(vpositions[curExprBegin], tbls.lextable, v); // заполняем вектор строками ТЛ в прямом порядке
+				int lexcount = fillVector(vpositions[curExprBegin], tbls.lextable, v); 
 				if (lexcount > 1)
 				{
-					bool rc = setPolishNotation(tbls.idtable, log, vpositions[curExprBegin], v);   // получаем вектор co строками ТЛ в польской нотации
+					bool rc = StartPolishNat(tbls.idtable, log, vpositions[curExprBegin], v);  
 					if (!rc)
 						return false;
 				}
 
-				addToTable(new_table, tbls.idtable, v); // добавляем постpоенный вектор к ТЛ + корректировка ТИ
+				addToTable(new_table, tbls.idtable, v); 
 				i += lexcount - 1;
 				curExprBegin++;
 				continue;
 			}
 			if (tbls.lextable.table[i].lexema == LEX_ID || tbls.lextable.table[i].lexema == LEX_LITERAL)
 			{
-				int firstind = Lexer::getIndexInLT(new_table, tbls.lextable.table[i].idxTI);
+				int firstind = Lexer::IndexOfInLT(new_table, tbls.lextable.table[i].idxTI);
 				if (firstind == -1)
 					firstind = new_table.size;
 				tbls.idtable.table[tbls.lextable.table[i].idxTI].idxfirstLE = firstind;
@@ -81,10 +81,10 @@ namespace Polish
 		for (unsigned i = 0; i < v.size(); i++)
 		{
 			LT::Add(new_table, v[i]);
-			// правильная обратная связь между ТЛ и ТИ
+		
 			if (v[i].lexema == LEX_ID || v[i].lexema == LEX_LITERAL)
 			{
-				int firstind = Lexer::getIndexInLT(new_table, v[i].idxTI);
+				int firstind = Lexer::IndexOfInLT(new_table, v[i].idxTI);
 				idtable.table[v[i].idxTI].idxfirstLE = firstind;
 			}
 		}
@@ -93,25 +93,25 @@ namespace Polish
 	intvec getExprPositions(Lexer::LEX& tbls)
 	{
 		intvec v;
-		bool f_begin = false; // признак найденного конца выражения
-		bool f_end = false;  // признак найденного начала выражения
+		bool f_begin = false; 
+		bool f_end = false; 
 		int begin = 0;  int end = 0;
 
 		for (int i = 0; i < tbls.lextable.size; i++)
 		{
-			if (tbls.lextable.table[i].lexema == LEX_EQUAL) // начало выражения
+			if (tbls.lextable.table[i].lexema == LEX_EQUAL) 
 			{
 				begin = i + 1;
 				f_begin = true;
 				continue;
 			}
-			if (f_begin && tbls.lextable.table[i].lexema == LEX_SEPARATOR) // конец выражения
+			if (f_begin && tbls.lextable.table[i].lexema == LEX_SEPARATOR) 
 			{
 				end = i;
 				f_end = true;
 				continue;
 			}
-			if (f_begin && f_end)	// добавить начало и конец выражения в вектор
+			if (f_begin && f_end)	
 			{
 				v.push_back(begin);
 				f_begin = f_end = false;
@@ -120,25 +120,22 @@ namespace Polish
 		return v;
 	}
 
-	bool __cdecl setPolishNotation(IT::IdTable& idtable, Log::LOG& log, int lextable_pos, ltvec& v)
+	bool __cdecl StartPolishNat(IT::IdTable& idtable, Log::LOG& log, int lextable_pos, ltvec& v)
 	{
-		//результирующий вектор
 		vector < LT::Entry > result;
-		// стек для сохранения операторов
 		stack < LT::Entry > s;
-		// флаг вызова функции
 		bool ignore = false;
 
 		for (unsigned i = 0; i < v.size(); i++)
 		{
-			if (ignore)	// вызов функции считаем подставляемым значением и заносим в результат
+			if (ignore)	
 			{
 				result.push_back(v[i]);
 				if (v[i].lexema == LEX_RIGHTSK)
 					ignore = false;
 				continue;
 			}
-			int priority = PriorityOperation(v[i]); // его приоритет
+			int priority = PriorityOperation(v[i]);
 
 			if (v[i].lexema == LEX_LEFTSK || v[i].lexema == LEX_RIGHTSK || v[i].lexema == LEX_PL || v[i].lexema == LEX_MINUS || v[i].lexema == LEX_STAR || v[i].lexema == LEX_DIRSLASH || v[i].lexema == LEX_LEFT || v[i].lexema == LEX_RIGHT)
 			{
@@ -150,7 +147,6 @@ namespace Polish
 
 				if (v[i].lexema == LEX_RIGHTSK)
 				{
-					//выталкивание элементов до  скобки
 					while (!s.empty() && s.top().lexema != LEX_LEFTSK)
 					{
 						result.push_back(s.top());
@@ -160,7 +156,6 @@ namespace Polish
 						s.pop();
 					continue;
 				}
-				//выталкивание элем с большим/равным приоритетом в результат
 				while (!s.empty() && PriorityOperation(s.top()) >= priority)
 				{
 					result.push_back(s.top());
@@ -169,11 +164,11 @@ namespace Polish
 				s.push(v[i]);
 			}
 
-			if (v[i].lexema == LEX_LITERAL || v[i].lexema == LEX_ID) // идентификатор, идентификатор функции или литерал
+			if (v[i].lexema == LEX_LITERAL || v[i].lexema == LEX_ID) 
 			{
 				if (idtable.table[v[i].idxTI].idtype == IT::IDTYPE::F || idtable.table[v[i].idxTI].idtype == IT::IDTYPE::S)
 					ignore = true;
-				result.push_back(v[i]);	// операнд заносим в результирующий вектор
+				result.push_back(v[i]);	
 			}
 			if (v[i].lexema != LEX_LEFTSK & v[i].lexema != LEX_RIGHTSK & v[i].lexema != LEX_PL & v[i].lexema != LEX_MINUS & v[i].lexema != LEX_STAR & v[i].lexema != LEX_DIRSLASH & v[i].lexema != LEX_ID & v[i].lexema != LEX_LITERAL & v[i].lexema != LEX_LEFT & v[i].lexema != LEX_RIGHT)
 			{

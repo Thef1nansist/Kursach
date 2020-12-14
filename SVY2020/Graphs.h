@@ -1,6 +1,6 @@
 #pragma once
 #include "FST.h"
-#define N_GRAPHS 18
+#define N_GRAPHS 17
 
 // графы переходов 
 #define GRAPH_SEPARATORS 2,\
@@ -169,22 +169,22 @@
 	FST::NODE(1, FST::RELATION('g',6)),\
 	FST::NODE()
 
-
-
 #define GRAPH_CYCLE 6, \
 	FST::NODE(1,FST::RELATION('c',1)),\
-	FST::NODE(1,FST::RELATION('y',2)),\
+	FST::NODE(1,FST::RELATION('i',2)),\
 	FST::NODE(1,FST::RELATION('c',3)),\
 	FST::NODE(1,FST::RELATION('l',4)),\
 	FST::NODE(1,FST::RELATION('e',5)),\
 	FST::NODE()
 
-#define GRAPH_WRITE 6, \
-	FST::NODE(1, FST::RELATION('w',1)),\
-	FST::NODE(1, FST::RELATION('r',2)),\
-	FST::NODE(1, FST::RELATION('i',3)),\
-	FST::NODE(1, FST::RELATION('t',4)),\
-	FST::NODE(1, FST::RELATION('e',5)),\
+#define GRAPH_WRITE 8, \
+	FST::NODE(1, FST::RELATION('z',1)),\
+	FST::NODE(1, FST::RELATION('a',2)),\
+	FST::NODE(1, FST::RELATION('p',3)),\
+	FST::NODE(1, FST::RELATION('i',4)),\
+	FST::NODE(1, FST::RELATION('s',5)),\
+	FST::NODE(1, FST::RELATION('h',6)),\
+	FST::NODE(1, FST::RELATION('i',7)),\
 	FST::NODE()
 
 #define GRAPH_NEWLINE 8, \
@@ -228,9 +228,4 @@
 	FST::NODE(1,FST::RELATION('w',3)),\
 	FST::NODE()
 
-#define GRAPH_V_LITERAL 5, \
-    FST::NODE(1, FST::RELATION('q', 1)),\
-	FST::NODE(2, FST::RELATION('0', 2), FST::RELATION('1', 2)),\
-    FST::NODE(8, FST::RELATION('0', 3), FST::RELATION('1', 3), FST::RELATION('2', 3), FST::RELATION('3', 3), FST::RELATION('4', 3), FST::RELATION('5', 3), FST::RELATION('6', 3), FST::RELATION('7', 3)),\
-    FST::NODE(8, FST::RELATION('0', 4), FST::RELATION('1', 4), FST::RELATION('2', 4), FST::RELATION('3', 4), FST::RELATION('4', 4), FST::RELATION('5', 4), FST::RELATION('6', 4), FST::RELATION('7', 4)),\
-    FST::NODE()
+

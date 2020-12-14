@@ -20,11 +20,11 @@ namespace Log
 	};
 
 	LOG getstream(wchar_t logfile[]);
-	void writeLog(LOG& log);									//написать в журнал
-	void writeLine(std::ostream* stream, char* c, ...);			//вывести  строку в поток
-	void writeParm(LOG& log, Parm::PARM& parm);					//вывести параметры в журнал
-	void writeIn(std::ostream* stream, In::IN& in);				//получить поток
-	void writeWords(std::ostream* stream, In::InWord* words);	//вывести слова в поток
-	void writeError(std::ostream* stream, Error::ERROR error);	//вывести ошибки в поток
-	void Close(LOG& log);										//закрыть поток
+	void writeLog(LOG& log);									
+	void writeLine(std::ostream* stream, char* c, ...);			
+	void writeParm(LOG& log, Parm::PARM& parm);					
+	void writeIn(std::ostream* stream, In::IN& in);				
+	void writeWords(std::ostream* stream, In::InWord* words);	
+	void writeError(std::ostream* stream, Error::ERROR error);	
+	void Close(LOG& log);										
 }

@@ -25,7 +25,7 @@
 #define LEX_ISTRUE		 'w'	// ложный блок
 #define LEX_ISFALSE		 'r'	// истинный блок
 #define LEX_CYCLE		 'c'	// цикл
-#define LEX_WRITE		 'o'	// вывод
+#define LEX_ZAPISHI		 'o'	// вывод
 #define LEX_NEWLINE		 '^'	// перевод строки
 #define LEX_CONCLUSION	 'e'	// Выход из функции, процедуры
 #define LEX_PROCEDURE	 'p'	// ключевое слово процедуры
@@ -43,23 +43,23 @@ namespace LT	//таблица лексем
 {
 	struct Entry
 	{
-		char lexema;					//лексема
-		int sn;							//номер строки в исходном тексте
-		int idxTI;						//индекс в ТИ
+		char lexema;				
+		int sn;							
+		int idxTI;						
 
 		Entry();
 		Entry(char lexema, int snn, int idxti = NULLDX_TI);
 	};
 
-	struct LexTable						//экземпляр таблицы лексем
+	struct LexTable						
 	{
-		int maxsize;					//ёмкость таблицы лексем
-		int size;						//текущий размер таблицы лексем
-		Entry* table;					//массив строк ТЛ
+		int maxsize;					
+		int size;						
+		Entry* table;					
 	};
 
 	LexTable Create(int size);		            //ёмкость < LT_MAXSIZE
 	void Add(LexTable& lextable, Entry entry);	//экземпляр ТЛ, строка ТЛ
-	void writeLexTable(std::ostream* stream, LT::LexTable& lextable);		//вывести таблицу лексем
-	void writeLexemsOnLines(std::ostream* stream, LT::LexTable& lextable);	//вывести лексемы по строкам
+	void writeLexTable(std::ostream* stream, LT::LexTable& lextable);		
+	void writeLexemsOnLines(std::ostream* stream, LT::LexTable& lextable);	
 };

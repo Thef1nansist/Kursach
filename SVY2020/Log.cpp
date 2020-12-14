@@ -30,10 +30,10 @@ namespace Log
 		*log.stream << "\n----------- Протокол ------------ Дата: " << buffer << " ------------ \n\n";
 	}
 
-	void writeLine(std::ostream* stream, char* c, ...)		// вывести в протокол конкатенацию строк
+	void writeLine(std::ostream* stream, char* c, ...)		
 	{
-		char** ptr = &c;			// указатель для доступа к параметрам
-		char* result;				// строка результата
+		char** ptr = &c;			
+		char* result;			
 		result = new char[15];
 		int size = 0;
 
@@ -42,7 +42,7 @@ namespace Log
 			size_t slen = strlen(*ptr);
 			result = (char*)realloc(result, size + slen);
 			result[size] = '\0';
-			size += slen; // size - ПОЛНЫЙ размер буфера
+			size += slen; 
 			strcat_s(result, size + 1, *ptr);
 			ptr++;
 		}
@@ -61,9 +61,6 @@ namespace Log
 		*log.stream << "\n-in: " << inTxt
 			<< "\n-out: " << outTxt
 			<< "\n-log: " << logTxt;
-		//<< "\nДополнительные ключи:\n" <<
-		//(parm.f_LEX ? "-l  " : "") << (parm.f_ID ? "-i  " : "")
-		//<< (parm.f_RULES ? "-r  " : "") << (parm.f_COUT ? "-c  " : "") << "\n\n";
 	}
 
 	void writeIn(std::ostream* stream, In::IN& in)

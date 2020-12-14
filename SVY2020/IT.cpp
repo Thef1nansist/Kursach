@@ -25,7 +25,7 @@ namespace IT
 		idtable.table[idtable.size++] = entry;
 	}
 
-	// возврат: номер строки(если есть), TI_NULLIDX(если нет)
+	
 	int isId(IdTable& idtable, char id[SCOPED_ID_MAXSIZE])
 	{
 		for (int i = 0; i < idtable.size; i++)
@@ -41,7 +41,7 @@ namespace IT
 		return SetValue(&(idtable.table[index]), value);
 	}
 
-	bool SetValue(IT::Entry* entry, char* value) // установка значения переменной
+	bool SetValue(IT::Entry* entry, char* value) 
 	{
 		bool rc = true;
 		if (entry->iddatatype == NUM)
@@ -59,7 +59,7 @@ namespace IT
 		}
 		else
 		{
-			for (unsigned i = 1; i < strlen(value) - 1; i++)	// без кавычек
+			for (unsigned i = 1; i < strlen(value) - 1; i++)	
 				entry->value.vstr.str[i - 1] = value[i];
 			entry->value.vstr.str[strlen(value) - 2] = '\0';
 			entry->value.vstr.len = strlen(value) - 2;

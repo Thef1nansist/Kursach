@@ -5,7 +5,7 @@
 #define SCOPED_ID_MAXSIZE   MAXSIZE_ID*2 //макс число символов идентификатор + область видимости
 #define MAXSIZE_TI		4096			//макс число количество строк в таблице идентификаторов
 #define NUM_DEFAULT	0x00000000		//значение по умолчанию дл€ int
-#define STR_DEFAULT	0x00			//значение по умолчанию дл€ sting
+#define STR_DEFAULT	0x00			//значение по умолчанию дл€ string
 #define NULLIDX_TI		0xffffffff		//нет элемента таблицы идентификаторов
 #define STR_MAXSIZE	255				//максимальна€ длина строкового литерала
 #define NUM_MAXSIZE   127		//максимальное значение дл€ типа number
@@ -32,30 +32,25 @@ namespace IT
 	{
 		union
 		{
-			int	vint;            			//значение integer
+			int	vint;            			
 			struct
 			{
-				int len;					//количество символов
-				char str[STR_MAXSIZE - 1];//символы
-			} vstr;							//значение строки
+				int len;					
+				char str[STR_MAXSIZE - 1];//сами символы
+			} vstr;							//строковое значение
 			struct
 			{
-				int count;					// количество параметров функции
-				IDDATATYPE* types;			//типы параметров функции
+				int count;					// кол-во пр. функции
+				IDDATATYPE* types;			//типы парм функции
 			} params;
 		} value;						//значение идентификатора
 		int			idxfirstLE;				//индекс в таблице лексем		
 		char		id[SCOPED_ID_MAXSIZE];	//идентификатор
 		IDDATATYPE	iddatatype;				//тип данных
 		IDTYPE		idtype;					//тип идентификатора
-
-		Entry()							//конструктор без параметров
-		{
-			this->value.vint = NUM_DEFAULT;
-			this->value.vstr.len = NULL;
-			this->value.params.count = NULL;
-		};
-		Entry(char* id, int idxLT, IDDATATYPE datatype, IDTYPE idtype) //конструктор с параметрами
+		// дальше 2 конструктора
+		Entry() = default;
+		Entry(char* id, int idxLT, IDDATATYPE datatype, IDTYPE idtype) 
 		{
 			strncpy_s(this->id, id, SCOPED_ID_MAXSIZE - 1);
 			this->idxfirstLE = idxLT;
@@ -65,9 +60,9 @@ namespace IT
 	};
 	struct IdTable		//экземпл€р таблицы идентификаторов
 	{
-		int maxsize;	//Ємкость таблицы идентификаторов < TI_MAXSIZE
-		int size;		//текущий размер таблицы идентификаторов < maxsize
-		Entry* table;	//массив строк таблицы идентификаторов
+		int maxsize;	
+		int size;		
+		Entry* table;	
 	};
 	IdTable Create(int size = NULL);	//Ємкость таблицы идентификаторов < TI_MAXSIZE
 	void Add(					//добавить строку в таблицу идентификаторов

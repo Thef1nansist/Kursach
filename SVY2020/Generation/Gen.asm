@@ -23,18 +23,19 @@ ExitProcess PROTO:DWORD
 		VALS2 byte 'concat:', 0
 		VALS3 sdword 9
 		VALS4 sdword -9
-		VALS5 byte 'Nebeute ', 0
+		VALS5 byte 'nebeite ', 0
 		VALS6 byte 'pogaluista', 0
 		VALS7 byte '15December', 0
 		VALS8 byte 'iz srtoki v chislo:', 0
 		VALS9 sdword 40
 		VALS10 sdword 1
 		VALS11 byte 'sdvig vlevo:', 0
-		VALS12 sdword 5
-		VALS13 sdword 82
-		VALS14 byte ' ', 0
-		VALS15 sdword 3
-		VALS16 sdword 2
+		VALS12 sdword 127
+		VALS13 sdword 5
+		VALS14 sdword 82
+		VALS15 byte ' ', 0
+		VALS16 sdword 3
+		VALS17 sdword 2
 .data
 		temp sdword ?
 		buffer byte 256 dup(0)
@@ -209,10 +210,20 @@ call outnum
 push offset newline
 call outstr
 
+push VALS12
+push VALS12
+pop ebx
+pop eax
+add eax, ebx
+push eax
 
 push poexaliy
 push poexalix
 call min1
+push eax
+pop ebx
+pop eax
+add eax, ebx
 push eax
 
 pop ebx
@@ -225,13 +236,13 @@ call outnum
 push offset newline
 call outstr
 
-push VALS12
+push VALS13
 
 pop ebx
 mov poexalixru, ebx
 
 mov edx, poexalixru
-cmp edx, VALS13
+cmp edx, VALS14
 
 jl cycle2
 jmp cyclenext2
@@ -241,16 +252,16 @@ push poexalixru
 call outnum
 
 
-push offset VALS14
+push offset VALS15
 call outstr
 
 push poexalixru
-push VALS15
+push VALS16
 pop ebx
 pop eax
 add eax, ebx
 push eax
-push VALS16
+push VALS17
 pop ebx
 pop eax
 imul eax, ebx
@@ -260,12 +271,12 @@ pop ebx
 mov poexalixru, ebx
 
 mov edx, poexalixru
-cmp edx, VALS13
+cmp edx, VALS14
 
 jl cycle2
 cyclenext2:
 
-push offset VALS14
+push offset VALS15
 call outstr
 
 

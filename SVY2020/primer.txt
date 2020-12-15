@@ -25,7 +25,7 @@ poexali
 [
 	now number x = 9;
 	now number y = -9;
-	now string strokx = "Nebeute ";
+	now string strokx = "nebeite ";
 	now string stroky = "pogaluista";
         now string strokz = "15December";
         now number chil;
